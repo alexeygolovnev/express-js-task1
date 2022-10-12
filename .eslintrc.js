@@ -3,15 +3,14 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: [
-    'airbnb-base',
-  ],
+  extends: ['airbnb-base', 'eslint-plugin-node'],
   parserOptions: {
     ecmaVersion: 'latest',
+    node: true,
     sourceType: 'module',
   },
   rules: {
     'no-console': 'off',
-    // 'linebreak-style': ['error', process.env.NODE_ENV === 'prod' ? 'unix' : 'windows'],
+    'max-len': ['error', { code: 100 }],
   },
 };

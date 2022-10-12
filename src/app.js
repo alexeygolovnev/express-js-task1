@@ -1,15 +1,23 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
+import userRouter from './components/user/user.route';
+import Db from './db';
 
 dotenv.config();
 
 const { PORT } = process.env;
-const server = express();
+const app = express();
 
-server.get('/', (req, res) => {
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/', (_, res) => {
   res.json({ result: 'ok' });
 });
 
-server.listen(PORT, () => {
+app.use('/user', userRouter);
+
+app.listen(PORT, () => {
+  Db.generateTestsUsers();
   console.log(`Server started on the port ${PORT}`);
 });
