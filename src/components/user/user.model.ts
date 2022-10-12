@@ -1,21 +1,22 @@
-import Ajv from 'ajv';
+import Ajv, { JSONSchemaType } from 'ajv';
 import ajvErrors from 'ajv-errors';
+import { User } from '@shared/types/user';
 
 const ajv = new Ajv({ allErrors: true });
 
 ajvErrors(ajv);
 
-const userSchema = {
+const userSchema: JSONSchemaType<User> = {
   type: 'object',
   properties: {
-    id: { type: 'string' },
+    id: { type: 'string', nullable: true },
     login: { type: 'string' },
     password: {
       type: 'string',
       pattern: '(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{6,15})$',
     },
     age: { type: 'number', minimum: 4, maximum: 130 },
-    isDeleted: { type: 'boolean' },
+    isDeleted: { type: 'boolean', nullable: true },
   },
   required: ['login', 'password', 'age'],
   additionalProperties: false,
@@ -27,9 +28,9 @@ const userSchema = {
   },
 };
 
-const validate = ajv.compile(userSchema);
+const validate = ajv.compile<User>(userSchema);
 
-const validateUser = (data) => {
+const validateUser = (data: User) => {
   const isValid = validate(data);
 
   const errors = validate?.errors?.map((error) => error.message) || [];

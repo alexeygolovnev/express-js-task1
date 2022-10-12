@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Router } from 'express';
 import UserController from './user.controller';
 import { setDefaultSearchQueryParams, validateLogin } from './user.middlewares';
 
-const userRouter = express.Router();
+const userRouter: Router = express.Router();
 
 userRouter.get('/all', UserController.getAllUsers);
 

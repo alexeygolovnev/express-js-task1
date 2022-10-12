@@ -1,22 +1,19 @@
-import Db from '../../db';
+import { Request, Response, NextFunction } from 'express';
+import Db from '../../db/init';
 
-function setDefaultSearchQueryParams(req, res, next) {
+function setDefaultSearchQueryParams(req: Request, res: Response, next: NextFunction) {
   if (!req.query.loginSubstr) {
     req.query.loginSubstr = '';
   }
 
-  if (req.query.limit) {
-    req.query.limit = parseInt(req.query.limit, 10);
-
-    if (!Number.isInteger(req.query.limit)) {
-      req.query.limit = 0;
-    }
+  if (!req.query.limit) {
+    req.query.limit = '0';
   }
 
   next();
 }
 
-function validateLogin(req, res, next) {
+function validateLogin(req: Request, res: Response, next: NextFunction) {
   const { login } = req.body;
 
   if (login) {
