@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import db from '../../db/init';
+import db from '@db/init';
 import { validateUser } from './user.model';
 
 export default class UserController {

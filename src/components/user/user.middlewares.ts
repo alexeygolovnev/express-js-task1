@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import Db from '../../db/init';
+import Db from '@db/init';
 
 function setDefaultSearchQueryParams(req: Request, res: Response, next: NextFunction) {
   if (!req.query.loginSubstr) {
