@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Db from '@db/init';
+import { validateUser } from './user.model';
 
 function setDefaultSearchQueryParams(req: Request, res: Response, next: NextFunction) {
   if (!req.query.loginSubstr) {
@@ -13,7 +14,20 @@ function setDefaultSearchQueryParams(req: Request, res: Response, next: NextFunc
   next();
 }
 
-function validateLogin(req: Request, res: Response, next: NextFunction) {
+function userValidation(req: Request, res: Response, next: NextFunction) {
+  const { isValid, errors } = validateUser(req.body);
+
+  if (!isValid) {
+    return res.status(400).json({
+      ok: false,
+      errors,
+    });
+  }
+
+  next();
+}
+
+function loginValidation(req: Request, res: Response, next: NextFunction) {
   const { login } = req.body;
 
   if (login) {
@@ -32,4 +46,4 @@ function validateLogin(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-export { setDefaultSearchQueryParams, validateLogin };
+export { setDefaultSearchQueryParams, loginValidation, userValidation };

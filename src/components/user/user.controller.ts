@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import db from '@db/init';
-import { validateUser } from './user.model';
 
 export default class UserController {
   static getAllUsers(req: Request, res: Response) {
@@ -23,36 +22,22 @@ export default class UserController {
   }
 
   static createUser(req: Request, res: Response) {
-    const { body } = req;
-    const { isValid, errors } = validateUser(body);
+    const userDTO = req.body;
 
-    if (!isValid) {
-      return res.status(400).json({
-        ok: false,
-        errors,
-      });
-    }
-
-    const userId = db.createUser(body);
+    const userId = db.createUser(userDTO);
 
     return res.status(201).json({ ok: true, id: userId });
   }
 
   static updateUser(req: Request, res: Response) {
     const { id } = req.params;
-    const { body } = req;
+    const userDTO = req.body;
 
     if (!id) {
       return res.json(`Param id is required`);
     }
 
-    const { isValid, errors } = validateUser(body);
-
-    if (!isValid) {
-      return res.status(400).json(errors);
-    }
-
-    const result = db.updateUser(id, body);
+    const result = db.updateUser(id, userDTO);
 
     const response = {
       ok: result,
@@ -65,7 +50,7 @@ export default class UserController {
 
   static deleteUser(req: Request, res: Response) {
     const { id } = req.params;
-
+  
     if (!id) {
       return res.json(`Param id is required`);
     }

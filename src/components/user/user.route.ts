@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import UserController from './user.controller';
-import { setDefaultSearchQueryParams, validateLogin } from './user.middlewares';
+import { setDefaultSearchQueryParams, loginValidation, userValidation } from './user.middlewares';
 
 const userRouter: Router = express.Router();
 
@@ -12,11 +12,11 @@ userRouter.get(
   UserController.getAutoSuggestUsers
 );
 
-userRouter.post('/', validateLogin, UserController.createUser);
+userRouter.post('/', userValidation, loginValidation, UserController.createUser);
 
 userRouter.get('/:id', UserController.getUserById);
 
-userRouter.put('/:id', validateLogin, UserController.updateUser);
+userRouter.put('/:id', userValidation, loginValidation, UserController.updateUser);
 
 userRouter.delete('/:id', UserController.deleteUser);
 
