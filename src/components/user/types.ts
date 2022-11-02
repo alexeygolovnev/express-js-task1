@@ -1,7 +1,7 @@
-import User from "./user.entity";
+import User from './user.entity';
 
 type UserId = User['userId'];
 
 export {
-    UserId,
-}
+  UserId
+};

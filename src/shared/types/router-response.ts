@@ -6,5 +6,5 @@ interface RouterResponse {
 }
 
 export {
-    RouterResponse
-}
+  RouterResponse
+};

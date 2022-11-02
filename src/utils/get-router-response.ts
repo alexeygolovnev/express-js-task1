@@ -8,21 +8,21 @@ interface GetRouterResponseParams<T> {
     errors?: string[];
 }
 
-function getRouterResponse<T>({
-    isSuccessed,
-    data, 
-    successMessage = 'Successed',
-    failureMessage = 'Something went wrong',
-    errors,
+function getRouterResponse<T> ({
+  isSuccessed,
+  data,
+  successMessage = 'Successed',
+  failureMessage = 'Something went wrong',
+  errors
 }: GetRouterResponseParams<T>): RouterResponse {
-    return {
-        ok: isSuccessed,
-        data,
-        message: isSuccessed ? successMessage : failureMessage,
-        errors,
-    }
+  return {
+    ok: isSuccessed,
+    data,
+    message: isSuccessed ? successMessage : failureMessage,
+    errors
+  };
 }
 
 export {
-    getRouterResponse
-}
+  getRouterResponse
+};
