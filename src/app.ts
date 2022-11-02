@@ -1,23 +1,29 @@
-import express, { Express, Request, Response } from 'express';
+import "reflect-metadata";
+import express, { Express } from 'express';
 import * as dotenv from 'dotenv';
-import userRouter from '@components/user/user.route';
-import db from '@db/init';
+import  { initLoaders } from '@loaders/index';
+import { dataSource } from '@configs/database';
 
 dotenv.config();
 
-const { PORT } = process.env;
-const app: Express = express();
+async function startServer() {
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+  try {
+    await dataSource.initialize();
+    console.log('Database connected');
+  }
+  catch(error) {
+    console.log('Database connection error', { error });
+  }
 
-app.get('/', (req: Request, res: Response) => {
-  res.json({ result: 'ok' });
-});
+  const { PORT } = process.env;
+  const app: Express = express();
+  
+  initLoaders(app);
 
-app.use('/user', userRouter);
+  app.listen(PORT, () => {
+    console.log(`Server started on the port ${PORT}`);
+  });
+}
 
-app.listen(PORT, () => {
-  db.generateTestsUsers();
-  console.log(`Server started on the port ${PORT}`);
-});
+startServer();

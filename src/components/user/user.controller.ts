@@ -1,84 +1,126 @@
 import { Request, Response } from 'express';
-import db from '@db/init';
+import { getRouterResponse } from '@utils/get-router-response';
+import UserService  from './user.service';
+import User from './user.entity';
+import { UserId } from './types';
 
 export default class UserController {
-  static getAllUsers(req: Request, res: Response) {
-    const users = db.getAllUsers();
+  private userService: UserService;
 
-    res.json(users);
+  constructor() {
+     this.userService = new UserService();
+
+     this.getAllUsers = this.getAllUsers.bind(this);
+     this.getUserById = this.getUserById.bind(this);
+     this.createUser = this.createUser.bind(this);
+     this.updateUser = this.updateUser.bind(this);
+     this.softRemoveUser = this.softRemoveUser.bind(this);
+     this.getAutoSuggestUsersByLogin = this.getAutoSuggestUsersByLogin.bind(this);
   }
 
-  static getUserById(req: Request, res: Response) {
+  async getAllUsers(req: Request, res: Response) {
+    const users = await this.userService.getAll();
+    
+    res.json(getRouterResponse<User[]>({
+      isSuccessed: true, data: users
+    }));
+  }
+
+  async getUserById(req: Request, res: Response) {
     const { id } = req.params;
-    const user = db.getUserById(id);
+    const user = await this.userService.getById(+id);
 
-    if (user) {
-      return res.status(200).json(user);
-    }
-
-    return res
-      .status(404)
-      .json({ ok: false, message: `User with id ${id} was not found` });
+    return res.status(user ? 200 : 400).json(
+      getRouterResponse<User>({
+        isSuccessed: !!user,
+        data: user,
+        failureMessage: `User with id ${id} was not found`,
+      })
+    );
   }
 
-  static createUser(req: Request, res: Response) {
+  async createUser(req: Request, res: Response) {
     const userDTO = req.body;
 
-    const userId = db.createUser(userDTO);
-
-    return res.status(201).json({ ok: true, id: userId });
+    const { userId } = await this.userService.create(userDTO);
+  
+    return res.status(201).json(
+      getRouterResponse<UserId>({
+        isSuccessed: true,
+        data: userId,
+        successMessage: 'User created',
+      })
+    );
   }
 
-  static updateUser(req: Request, res: Response) {
+  async updateUser(req: Request, res: Response) {
     const { id } = req.params;
     const userDTO = req.body;
 
     if (!id) {
-      return res.json(`Param id is required`);
+      return res.status(400).json(
+        getRouterResponse<null>({
+          isSuccessed: false,
+          failureMessage: 'Param id is required',
+        })
+      );
     }
 
-    const result = db.updateUser(id, userDTO);
-
-    const response = {
-      ok: result,
-      status: result ? 200 : 400,
-      message: result ? "User was updated" : "Something wrong",
+    const result = await this.userService.update(+id, userDTO);
+   
+    if (!result?.affected) {  
+      return res.status(400).json(
+        getRouterResponse<null>({ isSuccessed: false })
+      );
     }
-
-    return res.status(response.status).json(response);
+   
+    return res.json(
+      getRouterResponse<null>({
+        isSuccessed: true,
+        successMessage: 'User updated',
+      })
+    );
   }
 
-  static deleteUser(req: Request, res: Response) {
+  async softRemoveUser(req: Request, res: Response) {
     const { id } = req.params;
   
     if (!id) {
-      return res.json(`Param id is required`);
+      return res.json(
+        getRouterResponse<null>({
+          isSuccessed: false,
+          failureMessage: 'Param ID is required',
+        })
+      );
     }
 
-    const result = db.deleteUser(id);
+    const result = await this.userService.softRemove(+id);
 
-    const response = {
-      ok: result,
-      status: result ? 200 : 400,
-      message: result ? `User removed` : 'Something wrong',
+    if (!result) {
+      res.status(200).json(
+        getRouterResponse<User>({ isSuccessed: false })
+      );
     }
 
-    res.status(response.status).json(response);
+    res.status(400).json(
+      getRouterResponse<User>({
+        isSuccessed: true,
+        data: result,
+        successMessage: 'User removed',
+      })
+    );
   }
 
-  static getAutoSuggestUsers(req: Request, res: Response) {
+  async getAutoSuggestUsersByLogin(req: Request, res: Response) {
     const { loginSubstr, limit } = req.query;
 
-    const users = db.getAllUsers();
+    const users = await this.userService.getAutoSuggestByLogin(loginSubstr as string, +limit!);
 
-    const sortedUsers = users.sort((a, b) => b.login.localeCompare(a.login));
-
-    const filteredUsers = sortedUsers.filter(
-      (user) => user.login.indexOf(loginSubstr as string) > -1
+    res.json(
+      getRouterResponse<User[]>({
+        isSuccessed: true,
+        data: users,
+      })
     );
-
-    const limitedUsers = filteredUsers.slice(0, +(limit as string));
-
-    res.json(limitedUsers);
   }
 }

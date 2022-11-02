@@ -2,17 +2,24 @@
     "compilerOptions": {
         "module": "commonjs",
         "esModuleInterop": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
         "target": "ES6",
+        "lib": ["ES2016"],
         "noImplicitAny": true,
         "moduleResolution": "node",
         "sourceMap": true,
         "strictNullChecks": true,
         "outDir": "dist",
-        "baseUrl": "./src",
+        "baseUrl": ".",
         "paths": {
-            "@components/*": ["./components/*"],
-            "@db/*": ["./db/*"],
-            "@shared/*": ["./shared/*"]
+            "@components/*": ["./src/components/*"],
+            "@db/*": ["./src/db/*"],
+            "@shared/*": ["./src/shared/*"],
+            "@loaders": ["./src/loaders"],
+            "@loaders/*": ["./src/loaders/*"],
+            "@configs/*": ["./src/configs/*"],
+            "@utils/*": ["./src/utils/*"],
         }
     },
     "ts-node": {

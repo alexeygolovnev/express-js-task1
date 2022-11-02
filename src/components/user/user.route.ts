@@ -1,23 +1,24 @@
 import express, { Router } from 'express';
 import UserController from './user.controller';
-import { setDefaultSearchQueryParams, loginValidation, userValidation } from './user.middlewares';
+import { validateUser } from './user.middlewares';
 
 const userRouter: Router = express.Router();
 
-userRouter.get('/all', UserController.getAllUsers);
+const userController = new UserController();
+
+userRouter.get('/all', userController.getAllUsers);
 
 userRouter.get(
   '/search',
-  setDefaultSearchQueryParams,
-  UserController.getAutoSuggestUsers
+  userController.getAutoSuggestUsersByLogin
 );
 
-userRouter.post('/', userValidation, loginValidation, UserController.createUser);
+userRouter.post('/', validateUser, userController.createUser);
 
-userRouter.get('/:id', UserController.getUserById);
+userRouter.get('/:id', userController.getUserById);
 
-userRouter.put('/:id', userValidation, loginValidation, UserController.updateUser);
+userRouter.put('/:id', validateUser, userController.updateUser);
 
-userRouter.delete('/:id', UserController.deleteUser);
+userRouter.delete('/:id', userController.softRemoveUser);
 
 export default userRouter;
